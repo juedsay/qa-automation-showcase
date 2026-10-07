@@ -12,7 +12,7 @@ running in CI, plus a documented workflow with Playwright Test Agents.
 
 ```
 ui-playwright/      # Playwright Test + TypeScript, Page Object Model, fixtures
-api-restassured/    # Java 21, Gradle (wrapper), RestAssured, JUnit 5, JSON Schema validation
+api-restassured/    # Java 21, Gradle 9.7.1 (wrapper), RestAssured 6, JUnit 6, JSON Schema validation
 ai-agents/          # planner / generator / healer output + DECISIONS.md
 .github/workflows/  # CI for both suites + Playwright report on GitHub Pages
 ```
@@ -54,7 +54,8 @@ pnpm report               # open the last HTML report
 
 # API (requires JDK 21)
 cd api-restassured
-./gradlew test
+./gradlew test                                     # report: build/reports/tests/test/index.html
+./gradlew test -Dtoolshop.apiUrl=http://localhost:8091   # run against a local Toolshop
 ```
 
 ## UI test rules
@@ -64,17 +65,32 @@ cd api-restassured
 - No raw CSS/XPath selectors unless there is no accessible alternative; document why if used.
 - No `waitForTimeout`. Rely on web-first assertions (`expect(locator).toBeVisible()`, etc.).
 - Page Objects expose actions and locators; assertions live in the specs.
-- Shared setup goes in fixtures (e.g. a logged-in page fixture), not in `beforeEach` copy-paste.
+- Shared setup goes in fixtures (e.g. `loggedInCustomer`), not in `beforeEach` copy-paste.
+- API helpers in `src/api/` are one class per resource (`UsersApi`, `CatalogApi`, `CheckoutApi`).
 
 ## API test rules
 
 - Every test creates the data it changes (e.g. registers its own user) and cleans up what the
   API allows it to delete. Read-only tests may use the seeded catalog (products, categories, brands).
-- Shared request spec: base URI, JSON content type, logging only on failure.
-- Validate response bodies with JSON Schema files under `src/test/resources/schemas/`.
-- Demo credentials are read from config, not hardcoded in tests.
+- Layers: `client/` (one client per resource, sends requests and returns raw responses),
+  `model/` (payload records), `data/` (factories), `support/` (arrange helpers, schemas), `tests/`.
+  Clients never assert; tests do. Specs are injected into clients (anonymous or authenticated).
+- Shared request spec: base URI, JSON in/out, snake_case mapping, logging only on failure,
+  `Authorization` header masked in logs.
+- Validate response bodies with JSON Schema (draft-04, the version RestAssured supports) under
+  `src/test/resources/schemas/`. Write regexes with character classes (`[0-9]`), not backslashes.
+- Look up product/category ids by name at runtime: they change whenever Toolshop reseeds.
+- Invoice billing city/state must match `/postcode-lookup` for the country + postcode.
+- No credentials in code: every test registers its own customer.
 - Cross-layer tests (API setup → UI action → API verification) live in `ui-playwright/`
   and use Playwright's `request` fixture for the API steps.
+
+## Known issues
+
+Defects found in Toolshop are kept as executable records that pass while the bug exists and
+fail once it is fixed: `test.fail()` in `ui-playwright/tests/known-issues/`, and characterization
+tests tagged `known-issue` in `api-restassured` (`KnownIssuesTest`). Never send requests that
+create data on the shared site just to prove a defect.
 
 ## Dependencies
 
@@ -83,6 +99,8 @@ cd api-restassured
   no git/tarball transitive deps). Do not relax them without asking.
 - Pin exact versions (`pnpm add -D --save-exact`) and commit `pnpm-lock.yaml`.
 - Review a new dependency (publisher, install scripts, transitive deps) before adding it.
+- Java: versions live in `api-restassured/gradle/libs.versions.toml`; the wrapper pins the
+  Gradle distribution SHA-256. Apply the same 7-day cooldown before adopting new releases.
 
 ## Test data and secrets
 
