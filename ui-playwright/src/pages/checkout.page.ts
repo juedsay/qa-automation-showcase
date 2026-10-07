@@ -32,6 +32,21 @@ export class CheckoutPage {
     this.orderConfirmation = page.locator('#order-confirmation');
   }
 
+  /** Steps 2-4 for a customer who is already signed in, keeping the prefilled billing address. */
+  async completeAsSignedInCustomer(method: PaymentMethod): Promise<void> {
+    await this.signedInProceedButton.click();
+    await this.addressProceedButton.click();
+    await this.payWith(method);
+  }
+
+  /** Reads the invoice number from the order confirmation ("... invoice number is INV-123."). */
+  async invoiceNumber(): Promise<string> {
+    const text = await this.orderConfirmation.textContent();
+    const match = text?.match(/INV-\d+/);
+    if (!match) throw new Error(`No invoice number in confirmation: "${text}"`);
+    return match[0];
+  }
+
   async payWith(method: PaymentMethod): Promise<void> {
     await this.paymentMethod.selectOption(method);
     // First click validates the payment ("Check payment"), second one places the order ("Confirm").
