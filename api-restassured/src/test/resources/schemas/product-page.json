@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Paginated product list",
+  "type": "object",
+  "required": ["current_page", "data", "per_page", "total", "last_page"],
+  "properties": {
+    "current_page": { "type": "integer", "minimum": 1 },
+    "per_page": { "type": "integer", "minimum": 1 },
+    "total": { "type": "integer", "minimum": 0 },
+    "last_page": { "type": "integer", "minimum": 1 },
+    "data": { "type": "array", "items": { "$ref": "product.json#" } }
+  }
+}

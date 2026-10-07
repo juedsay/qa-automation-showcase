@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Cart",
+  "type": "object",
+  "required": ["id", "cart_items"],
+  "properties": {
+    "id": { "type": "string" },
+    "cart_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "quantity", "product_id", "product"],
+        "properties": {
+          "id": { "type": "string" },
+          "quantity": { "type": "integer", "minimum": 1 },
+          "product_id": { "type": "string" },
+          "product": { "$ref": "product.json#" }
+        }
+      }
+    }
+  }
+}

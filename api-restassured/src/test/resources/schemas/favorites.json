@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Favorites of the authenticated customer",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "user_id", "product_id", "product"],
+    "properties": {
+      "id": { "type": "string" },
+      "user_id": { "type": "string" },
+      "product_id": { "type": "string" },
+      "product": { "$ref": "product.json#" }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Product",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "description",
+    "price",
+    "is_rental",
+    "in_stock"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9A-Z]{26}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0
+    },
+    "is_rental": {
+      "type": "boolean"
+    },
+    "in_stock": {
+      "type": "boolean"
+    },
+    "category": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "brand": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "description": "Product. category and brand are only included by the /products endpoints, not when a product is embedded in a cart, favorite or invoice line."
+}

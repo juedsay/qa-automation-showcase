@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Address",
+  "type": "object",
+  "required": ["street", "house_number", "city", "state", "country", "postal_code"],
+  "properties": {
+    "street": { "type": ["string", "null"] },
+    "house_number": { "type": ["string", "null"] },
+    "city": { "type": ["string", "null"] },
+    "state": { "type": ["string", "null"] },
+    "country": { "type": ["string", "null"] },
+    "postal_code": { "type": ["string", "null"] }
+  }
+}
