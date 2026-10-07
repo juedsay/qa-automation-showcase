@@ -1,4 +1,4 @@
-import { test as base, Page } from '@playwright/test';
+import { test as base } from '@playwright/test';
 import { ToolshopApi } from '../api/toolshop-api';
 import { buildCustomer, Customer } from '../data/customer';
 import { CartPage } from '../pages/cart.page';
@@ -20,8 +20,11 @@ interface Fixtures {
   checkoutPage: CheckoutPage;
   /** A brand-new customer registered through the API, isolated from other test runs. */
   newCustomer: Customer;
-  /** `page` already authenticated as `newCustomer`, without going through the login form. */
-  loggedInPage: Page;
+  /**
+   * Authenticates `page` as `newCustomer` without going through the login form,
+   * and yields that customer.
+   */
+  loggedInCustomer: Customer;
 }
 
 export const test = base.extend<Fixtures>({
@@ -58,11 +61,14 @@ export const test = base.extend<Fixtures>({
     // Emails are unique per run, so leftovers never collide with later runs.
   },
 
-  loggedInPage: async ({ page, api, newCustomer }, use) => {
+  loggedInCustomer: async ({ page, api, newCustomer }, use) => {
     const token = await api.login(newCustomer.email, newCustomer.password);
     // The Angular app reads the JWT from localStorage on startup (TokenStorageService).
-    await page.addInitScript((value) => window.localStorage.setItem('auth-token', value), token);
-    await use(page);
+    // Set it once on the app's origin (not via addInitScript, which would re-inject it on
+    // every navigation and undo a logout); the test's first navigation picks it up.
+    await page.goto('/');
+    await page.evaluate((value) => window.localStorage.setItem('auth-token', value), token);
+    await use(newCustomer);
   },
 });
 

@@ -11,9 +11,8 @@ export type PaymentMethod =
 export class CheckoutPage {
   readonly signedInProceedButton: Locator;
   readonly addressProceedButton: Locator;
-  readonly street: Locator;
-  readonly city: Locator;
   readonly postalCode: Locator;
+  readonly houseNumber: Locator;
   readonly paymentMethod: Locator;
   readonly finishButton: Locator;
   readonly paymentSuccess: Locator;
@@ -22,9 +21,8 @@ export class CheckoutPage {
   constructor(page: Page) {
     this.signedInProceedButton = page.getByTestId('proceed-2');
     this.addressProceedButton = page.getByTestId('proceed-3');
-    this.street = page.getByTestId('street');
-    this.city = page.getByTestId('city');
     this.postalCode = page.getByTestId('postal_code');
+    this.houseNumber = page.getByTestId('house_number');
     this.paymentMethod = page.getByTestId('payment-method');
     this.finishButton = page.getByTestId('finish');
     this.paymentSuccess = page.getByTestId('payment-success-message');
