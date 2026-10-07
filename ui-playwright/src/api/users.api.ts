@@ -2,14 +2,11 @@ import { APIRequestContext, expect } from '@playwright/test';
 import { env } from '../config/env';
 import { Customer } from '../data/customer';
 
-/**
- * Thin client for the Toolshop REST API, used to set up test state
- * faster and more reliably than going through the UI.
- */
-export class ToolshopApi {
+/** `/users`: registration and login, used to set up test state without the UI. */
+export class UsersApi {
   constructor(private readonly request: APIRequestContext) {}
 
-  async registerCustomer(customer: Customer): Promise<void> {
+  async register(customer: Customer): Promise<void> {
     const response = await this.request.post(`${env.apiUrl}/users/register`, {
       headers: { Accept: 'application/json' },
       data: {
@@ -32,6 +29,7 @@ export class ToolshopApi {
     expect(response.status(), await response.text()).toBe(201);
   }
 
+  /** Returns a JWT. Tokens expire after 5 minutes, so log in per test rather than sharing one. */
   async login(email: string, password: string): Promise<string> {
     const response = await this.request.post(`${env.apiUrl}/users/login`, {
       headers: { Accept: 'application/json' },
