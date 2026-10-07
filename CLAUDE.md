@@ -30,6 +30,10 @@ a public demo e-commerce app built for testing practice by Testsmith.
 - It is a **shared** environment: other people use the same accounts and data at the same time.
   Tests that change state (cart, profile, orders) use a freshly registered user with a unique
   email, not the shared demo accounts.
+- **Never send failed logins for a shared demo account.** Toolshop locks a non-admin account
+  after 3 failed attempts (`UserService::MAX_LOGIN_ATTEMPTS`) and there is no self-service
+  unlock; our own suite locked `customer@practicesoftwaretesting.com` this way on day 1.
+  Every login test, positive or negative, uses its own freshly registered customer.
 - The UI follows the browser language. Tests force `locale: 'en-US'` so text is stable.
 - Product IDs are generated values (ULIDs); locate products by name, never by hardcoded ID.
 - The project license allows use for reference/practice only; do not redistribute or host it.
