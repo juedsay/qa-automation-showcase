@@ -34,7 +34,12 @@ export class HomePage {
     await this.filters.getByRole('checkbox', { name, exact: true }).check();
   }
 
+  /**
+   * Searches for the product first, so it is found regardless of catalog order or pagination,
+   * then opens the card whose title matches the name exactly.
+   */
   async openProduct(name: string): Promise<void> {
-    await this.productNames.filter({ hasText: name }).first().click();
+    await this.search(name);
+    await this.productCards.getByRole('heading', { name, exact: true }).click();
   }
 }
