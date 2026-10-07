@@ -20,9 +20,16 @@ export class RegisterPage {
     await field('first-name').fill(customer.firstName);
     await field('last-name').fill(customer.lastName);
     await field('dob').fill(customer.dob);
+
+    // Once country, postal code and house number are valid, the form calls /postcode-lookup
+    // (after a 300 ms debounce) and overwrites street, city and state with the result.
+    // Wait for that call before typing the address, or our values can be silently replaced.
+    const postcodeLookup = this.page.waitForResponse((r) => r.url().includes('/postcode-lookup'));
     await field('country').selectOption(customer.address.country);
     await field('postal_code').fill(customer.address.postalCode);
     await field('house_number').fill(customer.address.houseNumber);
+    await postcodeLookup;
+
     await field('street').fill(customer.address.street);
     await field('city').fill(customer.address.city);
     await field('state').fill(customer.address.state);
