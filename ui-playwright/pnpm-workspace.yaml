@@ -1,0 +1,13 @@
+# Supply-chain hardening. pnpm 11 already defaults to most of this;
+# it is spelled out here so the policy is visible and reviewable.
+
+# Do not resolve package versions published less than 7 days ago.
+minimumReleaseAge: 10080
+
+# Fail the install if any dependency tries to run a lifecycle script
+# that has not been explicitly allowed below.
+strictDepBuilds: true
+allowBuilds: {}
+
+# Transitive dependencies may only come from the registry (no git/tarball URLs).
+blockExoticSubdeps: true
