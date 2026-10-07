@@ -1,0 +1,5 @@
+# Normalize line endings in the repo so Linux CI and Windows checkouts agree.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.jar binary
+*.png binary
