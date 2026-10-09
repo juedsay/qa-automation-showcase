@@ -28,3 +28,6 @@ Thumbs.db
 
 # Playwright MCP scratch output (agents)
 .playwright-mcp/
+
+# Demo video recordings (playwright.demo.config.ts)
+demo-results/
