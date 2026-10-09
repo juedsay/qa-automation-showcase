@@ -38,8 +38,16 @@ jobs:
     defaults:
       run:
         working-directory: ui-playwright
+    # The public site challenges datacenter IPs with a Cloudflare bot check, so in CI the UI
+    # suite runs against a disposable Toolshop started from the official images (ci/toolshop/).
+    env:
+      TOOLSHOP_BASE_URL: http://localhost:4200
+      TOOLSHOP_API_URL: http://localhost:8091
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start Toolshop (Docker)
+        working-directory: .
+        run: bash ci/toolshop/start.sh
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           package_json_file: ui-playwright/package.json # pnpm version from "packageManager"
@@ -70,6 +78,10 @@ jobs:
           name: playwright-test-results
           path: ui-playwright/test-results/
           retention-days: 7
+      - name: Toolshop logs
+        if: failure()
+        working-directory: .
+        run: docker compose -f ci/toolshop/docker-compose.yml logs --tail=200
 
   api-tests:
     name: API tests (RestAssured)
