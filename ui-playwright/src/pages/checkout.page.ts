@@ -1,4 +1,4 @@
-import { Locator, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
 export type PaymentMethod =
   | 'bank-transfer'
@@ -35,6 +35,9 @@ export class CheckoutPage {
   /** Steps 2-4 for a customer who is already signed in, keeping the prefilled billing address. */
   async completeAsSignedInCustomer(method: PaymentMethod): Promise<void> {
     await this.signedInProceedButton.click();
+    // Synchronization point, not a test assertion: the billing address is prefilled from the
+    // profile asynchronously. Proceeding before it arrives places the order without an address.
+    await expect(this.postalCode).not.toHaveValue('');
     await this.addressProceedButton.click();
     await this.payWith(method);
   }
