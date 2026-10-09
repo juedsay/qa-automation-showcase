@@ -144,6 +144,10 @@ scripts blocked.
 <details>
 <summary>Screenshots</summary>
 
+**CI run**
+
+![CI run](docs/assets/ci-run.png)
+
 **Playwright HTML report**
 
 ![Playwright report](docs/assets/playwright-report.png)
