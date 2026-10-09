@@ -58,6 +58,25 @@ cd api-restassured
 ./gradlew test -Dtoolshop.apiUrl=http://localhost:8091   # run against a local Toolshop
 ```
 
+## CI
+
+- `.github/workflows/ci.yml`: gitleaks (full history), UI suite and API suite on every push/PR.
+  Read-only token; third-party actions pinned by commit SHA (tag in a comment), applying the
+  same 7-day cooldown as dependencies.
+- The public site shows a Cloudflare bot check to GitHub-hosted runners, so the UI job runs against
+  a disposable Toolshop started from the official images (`ci/toolshop/`, pinned by digest).
+  Never try to get past the bot check. The API suite still runs against the public API.
+- Reproduce the CI setup locally:
+
+```bash
+bash ci/toolshop/start.sh
+TOOLSHOP_BASE_URL=http://localhost:4200 TOOLSHOP_API_URL=http://localhost:8091 pnpm --dir ui-playwright test
+docker compose -p toolshop down -v
+```
+
+- A local backend is faster than the public one and exposes races the public site hides: always
+  run new UI tests against both before pushing.
+
 ## UI test rules
 
 - Locators: `getByRole`, `getByLabel`, `getByPlaceholder`, `getByText`, or `getByTestId`
