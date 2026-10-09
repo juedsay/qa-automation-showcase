@@ -1,0 +1,48 @@
+# Disposable Toolshop (sprint 5) for CI, based on the project's official docker-compose.prod.yml:
+# https://github.com/testsmith-io/practice-software-testing
+#
+# Why: the public site sits behind a Cloudflare bot check that challenges GitHub-hosted runners
+# (datacenter IPs). Running our own instance inside the job is deterministic (fresh seed, no
+# third-party data) and does not load the shared public site. It is never exposed outside the runner.
+#
+# Images are pinned by digest. Differences from the official file: no cron service and the
+# database port is not published.
+name: toolshop
+
+services:
+  mariadb:
+    image: yobasystems/alpine-mariadb@sha256:8bb25ca2d68c81118fcf745959560de2f316a178abf9decc8bb5b6f86c929084 # 10.6.11
+    environment:
+      MYSQL_ROOT_PASSWORD: root # throwaway database inside the CI runner
+      MYSQL_USER: user
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: toolshop
+
+  laravel-api:
+    image: testsmith/practice-software-testing-sprint5-api@sha256:881cb7ecd76477994728648c0c16f6e9d2beed0f0217734843a32a7bb92553f0
+    environment:
+      - PHP_OPCACHE_VALIDATE_TIMESTAMPS=1
+      - DB_PORT=3306
+      - DB_HOST=mariadb
+      - host=localhost
+      - DISABLE_LOGGING=true
+    volumes:
+      - laravel-app-code:/var/www
+    depends_on:
+      - mariadb
+
+  web:
+    image: testsmith/practice-software-testing-web@sha256:950bafdc86501002c381e35d9b70e298fe211f4ab1fbfda334b67f03dffa048d
+    ports:
+      - 8091:80
+    depends_on:
+      - laravel-api
+
+  angular-ui:
+    image: testsmith/practice-software-testing-sprint5-ui@sha256:f907d8daae32dc90ba900e964928d00bf0aabfab7067eaeeaa49f5a0f70c52e6
+    ports:
+      - 4200:4200
+    command: bash -c "ng serve --host 0.0.0.0 --port 4200"
+
+volumes:
+  laravel-app-code:
