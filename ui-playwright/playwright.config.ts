@@ -22,5 +22,17 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Pinned explicitly (same as the preset) so layout-dependent behavior, such as the
+        // navbar collapsing into a hamburger menu, is identical locally, headed, in CI and
+        // for the Test Agents, regardless of the size of the developer's screen.
+        viewport: { width: 1280, height: 720 },
+        deviceScaleFactor: 1,
+      },
+    },
+  ],
 });
