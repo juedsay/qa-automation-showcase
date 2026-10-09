@@ -71,6 +71,11 @@ jobs:
           name: playwright-report
           path: ui-playwright/playwright-report/
           retention-days: 14
+      - name: Package report for GitHub Pages
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: ui-playwright/playwright-report/
       - name: Upload traces of failed tests
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -82,6 +87,24 @@ jobs:
         if: failure()
         working-directory: .
         run: docker compose -f ci/toolshop/docker-compose.yml logs --tail=200
+
+  publish-report:
+    name: Publish Playwright report (GitHub Pages)
+    needs: ui-tests
+    # Only from main, and also when tests failed, so the published report tells the truth.
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The only job with write access, and only to Pages.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
   api-tests:
     name: API tests (RestAssured)
