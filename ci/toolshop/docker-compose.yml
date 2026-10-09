@@ -5,8 +5,9 @@
 # (datacenter IPs). Running our own instance inside the job is deterministic (fresh seed, no
 # third-party data) and does not load the shared public site. It is never exposed outside the runner.
 #
-# Images are pinned by digest. Differences from the official file: no cron service and the
-# database port is not published.
+# Images are pinned by digest. Differences from the official file: no cron service, the database
+# port is not published, and the web server is the official nginx image with our own config
+# (the upstream web image is arm64-only).
 name: toolshop
 
 services:
@@ -32,7 +33,10 @@ services:
       - mariadb
 
   web:
-    image: testsmith/practice-software-testing-web@sha256:950bafdc86501002c381e35d9b70e298fe211f4ab1fbfda334b67f03dffa048d
+    # Official multi-arch nginx instead of `testsmith/practice-software-testing-web` (arm64 only).
+    image: nginx@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94 # 1.30.5-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - 8091:80
     depends_on:
