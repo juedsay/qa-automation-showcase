@@ -21,7 +21,7 @@ export class CatalogFilters {
   readonly ecoFriendly: Locator;
   readonly resetButton: Locator;
 
-  constructor(page: Page) {
+  constructor(private readonly page: Page) {
     this.sortSelect = page.getByTestId('sort');
     // ngx-slider handles; the min handle's name is a prefix of the max handle's, hence `exact`.
     this.minPrice = page.getByRole('slider', { name: 'ngx-slider', exact: true });
@@ -40,9 +40,11 @@ export class CatalogFilters {
   }
 
   /**
-   * Moves a price handle with the keyboard, one unit per key press. The app applies the
-   * filter when the handle is released (`userChangeEnd`), so callers should assert on the
-   * product list afterwards rather than on the slider.
+   * Moves a price handle with the keyboard by holding the arrow key down (one keydown per
+   * unit) and releasing it once, like a user would. The app sends one product request per
+   * release (`userChangeEnd`), so this produces a single request. Separate key presses would
+   * send one request each, and the app renders whichever response arrives last, even a stale
+   * one (see tests/known-issues/price-filter-stale-response.spec.ts).
    */
   async setPrice(handle: 'min' | 'max', target: number): Promise<void> {
     const slider = handle === 'min' ? this.minPrice : this.maxPrice;
@@ -50,7 +52,8 @@ export class CatalogFilters {
     const key = target < current ? 'ArrowLeft' : 'ArrowRight';
     await slider.focus();
     for (let i = 0; i < Math.abs(target - current); i++) {
-      await slider.press(key);
+      await this.page.keyboard.down(key);
     }
+    await this.page.keyboard.up(key);
   }
 }
