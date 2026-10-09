@@ -1,0 +1,12 @@
+
+Running 6 tests using 6 workers
+
+  ok 3 [chromium] › tests\agent-generated\sort-by-name.spec.ts:9:3 › Catalog sorting and filtering › Sort by name A-Z and Z-A (7.0s)
+  ok 5 [chromium] › tests\agent-generated\eco-filter.spec.ts:10:3 › Catalog sorting and filtering › Eco-friendly filter (7.7s)
+  ok 6 [chromium] › tests\agent-generated\sort-by-price.spec.ts:11:3 › Catalog sorting and filtering › Sort by price low-high and high-low (8.4s)
+  -  4 [chromium] › tests\agent-generated\reset-filters.spec.ts:7:3 › Catalog sorting and filtering › Reset filters and search
+  ok 1 [chromium] › tests\agent-generated\brand-filter.spec.ts:7:3 › Catalog sorting and filtering › Brand filter (13.6s)
+  ok 2 [chromium] › tests\agent-generated\price-range-filter.spec.ts:10:3 › Catalog sorting and filtering › Price range filter with the slider (mouse and keyboard) (15.6s)
+
+  1 skipped
+  5 passed (17.5s)

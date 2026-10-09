@@ -1,0 +1,154 @@
+
+Running 6 tests using 6 workers
+
+  ok 6 [chromium] › tests\agent-generated\sort-by-price.spec.ts:11:3 › Catalog sorting and filtering › Sort by price low-high and high-low (7.0s)
+  ok 5 [chromium] › tests\agent-generated\sort-by-name.spec.ts:9:3 › Catalog sorting and filtering › Sort by name A-Z and Z-A (7.1s)
+  x  3 [chromium] › tests\agent-generated\eco-filter.spec.ts:10:3 › Catalog sorting and filtering › Eco-friendly filter (13.7s)
+  x  2 [chromium] › tests\agent-generated\reset-filters.spec.ts:7:3 › Catalog sorting and filtering › Reset filters and search (13.2s)
+  x  4 [chromium] › tests\agent-generated\price-range-filter.spec.ts:10:3 › Catalog sorting and filtering › Price range filter with the slider (mouse and keyboard) (25.4s)
+  x  1 [chromium] › tests\agent-generated\brand-filter.spec.ts:7:3 › Catalog sorting and filtering › Brand filter (45.3s)
+
+
+  1) [chromium] › tests\agent-generated\brand-filter.spec.ts:7:3 › Catalog sorting and filtering › Brand filter 
+
+    Test timeout of 45000ms exceeded.
+
+    Error: page.waitForResponse: Test timeout of 45000ms exceeded.
+
+       8 |     const brands = page.getByRole('group', { name: 'Brands' });
+       9 |     const productsResponse = () =>
+    > 10 |       page.waitForResponse(
+         |            ^
+      11 |         (r) => r.url().includes('/products') && r.request().method() === 'GET' && r.ok(),
+      12 |       );
+      13 |     const toggle = async (name: string, checked: boolean) => {
+        at productsResponse (<ui-playwright>\tests\agent-generated\brand-filter.spec.ts:10:12)
+        at toggle (<ui-playwright>\tests\agent-generated\brand-filter.spec.ts:14:24)
+        at <ui-playwright>\tests\agent-generated\brand-filter.spec.ts:45:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-agent\agent-generated-brand-filt-29a28--and-filtering-Brand-filter-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-agent\agent-generated-brand-filt-29a28--and-filtering-Brand-filter-chromium\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-agent\agent-generated-brand-filt-29a28--and-filtering-Brand-filter-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results-agent\agent-generated-brand-filt-29a28--and-filtering-Brand-filter-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests\agent-generated\eco-filter.spec.ts:10:3 › Catalog sorting and filtering › Eco-friendly filter 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId(/^product-[0-9A-Z]{26}$/).first().getByText('CO₂:')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId(/^product-[0-9A-Z]{26}$/).first().getByText('CO₂:') with timeout 10000ms
+      - waiting for getByTestId(/^product-[0-9A-Z]{26}$/).first().getByText('CO₂:')
+
+
+      30 |     await homePage.goto();
+      31 |     await expect(homePage.productCards.first()).toBeVisible();
+    > 32 |     await expect(homePage.productCards.first().getByText('CO₂:')).toBeVisible();
+         |                                                                   ^
+      33 |     await expect(eco).not.toBeChecked();
+      34 |     const unfilteredCount = await homePage.productCards.count();
+      35 |
+        at <ui-playwright>\tests\agent-generated\eco-filter.spec.ts:32:67
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-agent\agent-generated-eco-filter-31a64-ltering-Eco-friendly-filter-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-agent\agent-generated-eco-filter-31a64-ltering-Eco-friendly-filter-chromium\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-agent\agent-generated-eco-filter-31a64-ltering-Eco-friendly-filter-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results-agent\agent-generated-eco-filter-31a64-ltering-Eco-friendly-filter-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests\agent-generated\price-range-filter.spec.ts:10:3 › Catalog sorting and filtering › Price range filter with the slider (mouse and keyboard) 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByRole('slider', { name: 'ngx-slider', exact: true })
+    Expected: "15"
+    Received: "16"
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveAttribute" getByRole('slider', { name: 'ngx-slider', exact: true }) with timeout 10000ms
+      - waiting for getByRole('slider', { name: 'ngx-slider', exact: true })
+        24 × locator resolved to <span tabindex="0" role="slider" aria-valuemin="0" ngxsliderhandle="" aria-labelledby="" aria-valuenow="16" aria-valuetext="16" aria-valuemax="200" aria-label="ngx-slider" _ngcontent-ng-c2097261832="" aria-orientation="horizontal" class="ngx-slider-span ngx-slider-pointer ngx-slider-pointer-min ngx-slider-active"></span>
+           - unexpected value "16"
+
+
+      69 |       await minHandle.press('ArrowRight');
+      70 |     }
+    > 71 |     await expect(minHandle).toHaveAttribute('aria-valuenow', '15');
+         |                             ^
+      72 |     // Handles cannot cross: one more press must not move the min handle past the max.
+      73 |     await minHandle.press('ArrowRight');
+      74 |     expect(await valueOf(minHandle)).toBeLessThanOrEqual(await valueOf(maxHandle));
+        at <ui-playwright>\tests\agent-generated\price-range-filter.spec.ts:71:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-agent\agent-generated-price-rang-e5bc0--slider-mouse-and-keyboard--chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-agent\agent-generated-price-rang-e5bc0--slider-mouse-and-keyboard--chromium\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-agent\agent-generated-price-rang-e5bc0--slider-mouse-and-keyboard--chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results-agent\agent-generated-price-rang-e5bc0--slider-mouse-and-keyboard--chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests\agent-generated\reset-filters.spec.ts:7:3 › Catalog sorting and filtering › Reset filters and search 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      65 |     const collator = new Intl.Collator('en', { sensitivity: 'base' });
+      66 |     const descending = names.every((n, i) => i === 0 || collator.compare(names[i - 1], n) >= 0);
+    > 67 |     expect(descending).toBe(true);
+         |                        ^
+      68 |
+      69 |     // 4. Reload the page (F5).
+      70 |     await page.reload();
+        at <ui-playwright>\tests\agent-generated\reset-filters.spec.ts:67:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-agent\agent-generated-reset-filt-fea2f-ng-Reset-filters-and-search-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-agent\agent-generated-reset-filt-fea2f-ng-Reset-filters-and-search-chromium\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-agent\agent-generated-reset-filt-fea2f-ng-Reset-filters-and-search-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results-agent\agent-generated-reset-filt-fea2f-ng-Reset-filters-and-search-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [chromium] › tests\agent-generated\brand-filter.spec.ts:7:3 › Catalog sorting and filtering › Brand filter 
+    [chromium] › tests\agent-generated\eco-filter.spec.ts:10:3 › Catalog sorting and filtering › Eco-friendly filter 
+    [chromium] › tests\agent-generated\price-range-filter.spec.ts:10:3 › Catalog sorting and filtering › Price range filter with the slider (mouse and keyboard) 
+    [chromium] › tests\agent-generated\reset-filters.spec.ts:7:3 › Catalog sorting and filtering › Reset filters and search 
+  2 passed (46.8s)

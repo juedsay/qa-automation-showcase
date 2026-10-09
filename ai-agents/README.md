@@ -33,9 +33,33 @@ Changes I made to the generated setup, and why:
   and page objects, and states the rules for exploring a shared site (never log in with the
   public demo accounts, which lock after 3 failed attempts; never create catalog data).
 
-Agents run on the `sonnet` model as defined by Playwright. The Claude Code session must be
-opened in `ui-playwright/` so it picks up `.claude/agents/` and `.mcp.json`, and the
-`playwright-test` MCP server has to be approved on first use.
+Agents run on the `sonnet` model as defined by Playwright. Claude Code only picks up
+`.claude/agents/` and `.mcp.json` when a session starts in `ui-playwright/`, so I ran each stage
+headless from there, with an explicit allow-list per agent:
+
+```bash
+cd ui-playwright
+claude -p "<task for the planner|generator|healer>" \
+  --mcp-config .mcp.json --strict-mcp-config \
+  --allowedTools "Agent" "Read" "Glob" "Grep" "LS" "mcp__playwright-test" \
+  --output-format json
+# healer only, on top of the above:
+#   "Edit(tests/agent-generated/**)" "MultiEdit(tests/agent-generated/**)" "Write(tests/agent-generated/**)"
+```
+
+Each prompt passed the agent the same rules as the seed (no demo accounts, no data creation, no
+fixed IDs or counts) and asked for a summary I could check against the files it wrote.
+
+## Results at a glance
+
+| Stage | Output | Result |
+|---|---|---|
+| Planner | 9 scenarios | 6 kept, 3 discarded as overlapping |
+| Generator | 6 test files | 2 passing, 4 failing on the first run |
+| Healer | 4 files changed | 5 passing + 1 real application defect marked `fixme` |
+| Integrated by me | `tests/catalog/sorting.spec.ts`, `tests/catalog/filtering.spec.ts`, `tests/known-issues/reset-keeps-stale-sort.spec.ts` | 6 tests + 1 known issue |
+
+Total agent cost: USD 3.41. Details and reasoning: [DECISIONS.md](DECISIONS.md).
 
 ## Folder layout
 

@@ -64,6 +64,11 @@ cd api-restassured
   (Toolshop uses the `data-test` attribute, configured as `testIdAttribute`).
 - No raw CSS/XPath selectors unless there is no accessible alternative; document why if used.
 - No `waitForTimeout`. Rely on web-first assertions (`expect(locator).toBeVisible()`, etc.).
+- After a sort/filter/search, poll the visible list (`expect.poll`) until it satisfies the
+  condition. Do not wait on network requests: the catalog request already changed method once
+  (`GET` -> `QUERY /products`). Beware stale lists that satisfy the condition by accident.
+- The viewport is pinned to 1280x720 in `playwright.config.ts`; do not override it per test
+  unless the test is about responsive layout.
 - Page Objects expose actions and locators; assertions live in the specs.
 - Shared setup goes in fixtures (e.g. `loggedInCustomer`), not in `beforeEach` copy-paste.
 - API helpers in `src/api/` are one class per resource (`UsersApi`, `CatalogApi`, `CheckoutApi`).
@@ -84,6 +89,16 @@ cd api-restassured
 - No credentials in code: every test registers its own customer.
 - Cross-layer tests (API setup → UI action → API verification) live in `ui-playwright/`
   and use Playwright's `request` fixture for the API steps.
+
+## Playwright Test Agents
+
+- Definitions live in `ui-playwright/.claude/agents/`, the MCP server in `ui-playwright/.mcp.json`
+  (started with `node`, not `npx`). Regenerate with `pnpm exec playwright init-agents --loop=claude`
+  after upgrading Playwright, then re-apply the `.mcp.json` change.
+- Agent output is a proposal: raw output goes to `ai-agents/`, only reviewed code reaches `tests/`,
+  and every decision is recorded in `ai-agents/DECISIONS.md`.
+- Always pass agents the shared-site rules (no demo-account logins, no data creation, no fixed
+  IDs or counts). The seed (`tests/seed.spec.ts`) states them too.
 
 ## Known issues
 
