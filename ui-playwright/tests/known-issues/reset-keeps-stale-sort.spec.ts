@@ -15,12 +15,15 @@ test.describe('Known issues', () => {
     await catalogFilters.sortBy(SortOption.nameDesc);
     await homePage.search('Pliers');
     await expect(homePage.searchCaption).toContainText('Pliers');
+    await expect.poll(async () => isDescending(await homePage.names(), compareNames)).toBe(true);
+    const searchResults = new Set(await homePage.names());
 
     await catalogFilters.resetButton.click();
     await expect(homePage.searchCaption).toBeHidden();
-    // Wait until the full catalog replaces the (already Z-A sorted) search results; asserting
-    // the order before that would pass on stale data and hide the defect.
-    await expect.poll(async () => (await homePage.names()).some((name) => !/pliers/i.test(name))).toBe(true);
+    // Wait until the full catalog replaces the (already Z-A sorted) search results; asserting the
+    // order before that would pass on stale data and hide the defect. The search for "Pliers" also
+    // matches products by description (e.g. "Bolt Cutters"), so wait for a name it did NOT return.
+    await expect.poll(async () => (await homePage.names()).some((name) => !searchResults.has(name))).toBe(true);
 
     await expect(catalogFilters.sortSelect).toHaveValue(SortOption.nameDesc.value);
     expect(isDescending(await homePage.names(), compareNames)).toBe(true);
